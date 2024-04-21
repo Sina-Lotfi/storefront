@@ -1,4 +1,3 @@
-from pyexpat import model
 from django.db import models
 
 # Create your models here.
@@ -7,28 +6,37 @@ from django.db import models
 class Promotion(models.Model):
     description = models.CharField(max_length=255)
     discount = models.FloatField()
- 
+
 
 class Collection(models.Model):
     title = models.CharField(max_length=255)
-    featured_product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')  
+    featured_product = models.ForeignKey(
+        'Product', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+
     def __str__(self) -> str:
         return self.title
+
     class Meta:
         ordering = ['title']
+
+
 class Product(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(default='-')
     description = models.TextField()
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
     inventory = models.IntegerField()
     last_update = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
     promotions = models.ManyToManyField(Promotion)
+
     def __str__(self) -> str:
         return self.title
+
     class Meta:
         ordering = ['title']
+
+
 class Customer(models.Model):
     MEMBERSHIP_BRONZE = 'B'
     MEMBERSHIP_SILVER = 'S'
@@ -45,6 +53,10 @@ class Customer(models.Model):
     birth_date = models.DateField(null=True, blank=True)
     membership = models.CharField(
         max_length=1, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE)
+
+    def __str__(self) -> str:
+        return f'{self.first_name} {self.last_name}'
+    ordering = ['first_name', 'last_name']
 
 
 class Order(models.Model):
@@ -83,4 +95,4 @@ class Cart(models.Model):
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveSmallIntegerField
+    quantity = models.PositiveSmallIntegerField()
