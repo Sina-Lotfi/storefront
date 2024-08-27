@@ -49,11 +49,22 @@ class InventoryFilter(admin.SimpleListFilter):
             return queryset.filter(inventory__gt=10)
 
 
+class ProductImageInline(admin.TabularInline):
+    model = models.ProductImage
+    readonly_fields = ["thumbnail"]
+
+    def thumbnail(self, instance: models.ProductImage):
+        if instance.image.name != "":
+            return format_html(f'<img src="{instance.image.url}" class="thumbnail"/>')
+        return ""
+
+
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     autocomplete_fields = ["collection"]
     prepopulated_fields = {"slug": ["title"]}
     actions = ["clear_inventory"]
+    inlines = [ProductImageInline]
     list_display = ("title", "unit_price", "inventory_status", "collection")
     list_editable = ("unit_price",)
     search_fields = ["title"]
@@ -73,6 +84,9 @@ class ProductAdmin(admin.ModelAdmin):
             request, f"{updated_count} was deleted successfully", messages.ERROR
         )
 
+    class Media:
+        css = {"all": ["store/styles.css"]}
+
 
 @admin.register(models.Customer)
 class CustomerAdmin(admin.ModelAdmin):
@@ -80,13 +94,13 @@ class CustomerAdmin(admin.ModelAdmin):
     list_display = ("first_name", "last_name", "membership")
     list_editable = ("membership",)
     list_per_page = 10
-    list_select_related = ['user']
+    list_select_related = ["user"]
     ordering = ("user__first_name", "user__last_name")
     search_fields = ["first_name__istartswith", "last_name__istartswith"]
 
 
 class OrderItemInline(admin.TabularInline):
-    model = models.OrderItme
+    model = models.OrderItem
     autocomplete_fields = ["product"]
     max_num = 10
     min_num = 0
