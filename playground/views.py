@@ -1,3 +1,7 @@
 from django.shortcuts import render
 
-# Create your views here.
+from .tasks import sina
+
+def say_hell(request):
+    sina.delay('hello')
+    return render(request,'<h1>sina</h1>')
