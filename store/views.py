@@ -3,7 +3,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.mixins import (
     CreateModelMixin,
@@ -14,17 +14,31 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework import status
 from .filters import ProductFiltering
 from .pagination import DefaultPagination
-from .models import Cart, CartItem, Collection, Customer, Product, Reviews
+from .models import (
+    Cart,
+    CartItem,
+    Collection,
+    Customer,
+    Order,
+    Product,
+    ProductImage,
+    Reviews,
+)
 from .serializers import (
     AddCartItemSerializer,
     CartItemSerializer,
     CartSerializer,
     CollectionSerializer,
+    CreateOrderSerializer,
     CustomerSerializer,
+    OrderSerializer,
+    OrderUpdateSerializer,
+    ProductImageSerializer,
     ProductSerializer,
     ReviewSerializer,
     UpdateCartItemSerializer,
 )
+from .permissions import IsAdminOrReadOnly, ViewCustomerHistoryPermission
 
 
 class ProductViewSet(ModelViewSet):
@@ -35,6 +49,7 @@ class ProductViewSet(ModelViewSet):
     pagination_class = DefaultPagination
     search_fields = ["title", "description"]
     ordering_fields = ["unit_price", "last_update"]
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_context(self):
         print(self.request.query_params)  # type: ignore
@@ -54,6 +69,7 @@ class ProductViewSet(ModelViewSet):
 
 class COllectionViewSet(ModelViewSet):
     serializer_class = CollectionSerializer
+    permission_classes = [IsAdminOrReadOnly]
     queryset = Collection.objects.annotate(products_count=Count("products")).all()
 
     def destroy(self, request, *args, **kwargs):
@@ -105,18 +121,18 @@ class CartItemViewSet(ModelViewSet):
         return {"cart_id": self.kwargs["cart_pk"]}
 
 
-class CustomerViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
+class CustomerViewSet(ModelViewSet):
     serializer_class = CustomerSerializer
     queryset = Customer.objects.all()
+    permission_classes = [IsAdminUser]
 
-    def get_permissions(self):
-        if self.request.method == "GET":
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    @action(detail=True, permission_classes=[ViewCustomerHistoryPermission])
+    def history(self, request, pk):
+        return Response("ok")
 
-    @action(detail=False, methods=["GET", "PUT"])
+    @action(detail=False, methods=["GET", "PUT"], permission_classes=[IsAuthenticated])
     def me(self, request):
-        user, created = Customer.objects.get_or_create(user_id=request.user.id)
+        user = Customer.objects.get(user_id=request.user.id)
         if request.method == "GET":
             serializer = CustomerSerializer(user)
             return Response(serializer.data)
@@ -125,3 +141,43 @@ class CustomerViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
+
+class OrderViewSet(ModelViewSet):
+    http_method_names = ["get", "patch", "post", "delete", "head", "options"]
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return CreateOrderSerializer
+        elif self.request.method == "PATCH":
+            return OrderUpdateSerializer
+        return OrderSerializer
+
+    def get_permissions(self):
+        if self.request.method in ["PATCH", "DELETE"]:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:  # type: ignore
+            return Order.objects.all()
+        customer_id = Customer.objects.only("id").get(user_id=user.id)  # type: ignore
+        return Order.objects.filter(customer_id=customer_id)
+
+    def create(self, request, *args, **kwargs):
+        serializer = CreateOrderSerializer(
+            data=request.data, context={"user_id": self.request.user.id}  # type: ignore
+        )
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
+
+
+class ProductImageViewSet(ModelViewSet):
+    serializer_class = ProductImageSerializer
+    def get_serializer_context(self):
+        return {'product_id':self.kwargs['product_pk']}
+    def get_queryset(self):
+        return ProductImage.objects.filter(product_id=self.kwargs["product_pk"])
