@@ -25,6 +25,7 @@ admin.site.index_title = "Admin"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("playground/", include("playground.urls")),
+    path("", include("core.urls")),
     path("store/", include("store.urls")),
     path("auth/", include("djoser.urls")),
     path("auth/", include("djoser.urls.jwt")),
@@ -32,3 +33,4 @@ urlpatterns = [
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
