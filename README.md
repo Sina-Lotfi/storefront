@@ -107,3 +107,17 @@ docker-compose run web ./wait-for-it.sh postgres:5432 -- pytest --tb=short --dis
 ```
 (Of course, if you have started the project with the `docker-compose up` command, you can watch the test results in the terminal.)
 
+## 🌐 API Endpoints
+
+The project exposes a variety of API endpoints to interact with the store, including:
+
+- **Authentication** - `POST /auth/jwt/create/`, `POST /auth/jwt/refresh/`
+- **Products** - `GET /products/`, `POST /products/`
+- **Orders** - `GET /orders/`, `POST /orders/`
+- **Likes** - `POST /products/:id/like`
+- **Tags** - `GET /tags/`, `POST /tags/`
+### Filters and Pagination
+- **Django Filters**: Enable filtering of products based on price, category, and tags.
+- **Custom Pagination**: Navigate through products and orders using paginated responses.
+### Notice
+This repository and its setup is only for the running of this project in the development environment and is not suitable for use in the final product and must have changes.
