@@ -71,8 +71,6 @@ Once Docker is installed, ensure Docker Compose is available by running:
 ```bash
 docker-compose --version
 ```
-### 3. **Running the Project:**
-```markdown
 ## 🐋 Running the Project
 
 You can easily spin up the project using Docker Compose:
