@@ -80,8 +80,8 @@ docker-compose up --build
 ```
 This command will:
 
-Build the Docker images for the Django app and Celery workers.
-Start the PostgreSQL, Redis, smtp4dev, and Flower services.
+Build the Docker images for the Django app and Celery workers.<br />
+Start the PostgreSQL, Redis, smtp4dev, and Flower services.<br />
 Expose the necessary ports:
   * Django app on localhost:8000
   * Flower on localhost:5555
