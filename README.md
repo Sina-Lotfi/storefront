@@ -86,3 +86,24 @@ Expose the necessary ports:
   * Django app on localhost:8000
   * Flower on localhost:5555
   * smtp4dev on localhost:5000
+### Celery Workers
+
+To manage background tasks like sending emails or processing orders, Celery workers will automatically start when running Docker Compose.
+
+### Flower Monitoring
+
+You can monitor Celery tasks and workers through the Flower interface on `localhost:5555`.
+
+## 🔬 Testing
+
+To run tests using Pytest, execute the following command inside the running Docker container:
+
+```bash
+docker-compose run web pytest
+```
+You can also run tests in development mode with file watching:
+```bash
+docker-compose run web ./wait-for-it.sh postgres:5432 -- pytest --tb=short --disable-warnings -p no:warnings
+```
+(Of course, if you have started the project with the `docker-compose up` command, you can watch the test results in the terminal.)
+
