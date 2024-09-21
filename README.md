@@ -1,6 +1,7 @@
 # 🛍️ Storefront Django Project
 
-This is a Django-based e-commerce platform built to showcase a range of backend and DevOps skills, including task management with Celery, background scheduling, JWT-based authentication, API development using Django REST Framework, and Docker containerization.
+This is a Django-based e-commerce platform built to showcase a range of backend and DevOps skills, including task management with Celery, background scheduling, JWT-based authentication, API development using Django REST Framework, and Docker containerization.<br />
+Also, most of the parts and applications of this project are modular and do not depend on each other and can be used separately in other projects.
 
 ## 📑 Table of Contents
 - [Features](#-features)
