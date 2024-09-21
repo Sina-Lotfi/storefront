@@ -78,3 +78,11 @@ You can easily spin up the project using Docker Compose:
 ```bash
 docker-compose up --build
 ```
+This command will:
+
+Build the Docker images for the Django app and Celery workers.
+Start the PostgreSQL, Redis, smtp4dev, and Flower services.
+Expose the necessary ports:
+  * Django app on localhost:8000
+  * Flower on localhost:5555
+  * smtp4dev on localhost:5000
