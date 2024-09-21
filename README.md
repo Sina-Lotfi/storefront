@@ -48,6 +48,7 @@ This is a Django-based e-commerce platform built to showcase a range of backend 
 ├── Dockerfile                # Docker build file for the Django app
 ├── pytest.ini                # Configuration for Pytest
 └── wait-for-it.sh            # Script to wait for services like PostgreSQL and Redis
+```
 ## 🚀 Setup
 
 To get started with this project, follow these steps:
@@ -56,3 +57,4 @@ To get started with this project, follow these steps:
 ```bash
 git clone https://github.com/yourusername/storefront.git
 cd storefront
+```
