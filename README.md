@@ -60,13 +60,13 @@ cd storefront
 ```
 ### Environment variables:
 Create a `.env` file to store environment variables such as your PostgreSQL database credentials, Redis configurations, etc.
-```
 Example `.env` file:
-POSTGRES_DB=your_db_name<br />
-POSTGRES_USER=your_db_user<br />
-POSTGRES_PASSWORD=your_db_password<br />
-REDIS_URL=redis://redis:6379/0<br />
-DJANGO_SECRET_KEY=your_secret_key<br />
+```
+POSTGRES_DB=your_db_name
+POSTGRES_USER=your_db_user
+POSTGRES_PASSWORD=your_db_password
+REDIS_URL=redis://redis:6379/0
+DJANGO_SECRET_KEY=your_secret_key
 ```
 ### Install Docker and Docker Compose:
 Make sure Docker is installed on your machine by following the official [Docker documentation](https://docs.docker.com/get-docker/).
